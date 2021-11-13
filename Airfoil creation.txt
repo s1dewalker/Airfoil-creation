@@ -1,0 +1,127 @@
+'------------------------------------------------------------------------
+'Main program
+'------------------------------------------------------------------------
+Sub Main()
+        
+    'Get the type of operations to do:
+    '   Points                  --> 1
+    '   Splines + Points        --> 2
+    '   Loft + Splines + Points --> 3
+    
+    
+    Dim TypeFile As Integer
+    TypeFile = GetTypeFile
+    
+    ' V5R12 - Create dedicate opneBody for created geometry
+    'Get CATIA
+    Dim PtDoc As Object
+    Set PtDoc = GetCATIAPartDocument
+    
+    ' Create Open body
+    Set myHBody = PtDoc.Part.HybridBodies.Add()
+    Set referencebody = PtDoc.Part.CreateReferenceFromObject(myHBody)
+    PtDoc.Part.HybridShapeFactory.ChangeFeatureName referencebody, "GeometryFromExcel"
+    
+    
+    If TypeFile = 1 Then
+        CreationPoint
+    ElseIf TypeFile = 2 Then
+        CreationSpline
+    ElseIf TypeFile = 3 Then
+        CreationLoft
+    End If
+    
+    
+End Sub
+
+Private Sub CommandButton1_Click()
+
+Dim flap As Integer
+Dim ele As Integer
+Dim j As Integer
+Dim i As Integer
+Dim size As Double
+Dim sx As Double
+Dim sy As Double
+Dim sz As Double
+Dim sx1 As Double
+Dim sy1 As Double
+Dim sz1 As Double
+Dim sy2 As Double
+Dim sx3 As Double
+Dim sy3 As Double
+Dim sz3 As Double
+Dim theta1 As Double
+Dim theta2 As Double
+Dim xr As Integer
+Dim yr As Integer
+Dim zr As Integer
+Dim xc As Integer
+Dim yc As Integer
+Dim zc As Integer
+Dim a As Integer
+Dim b As Integer
+Dim c As Integer
+
+xc = 15
+yc = 16
+zc = 17
+a = 3
+b = 3
+c = 3
+flap = InputBox("ENTER NO. OF FLAPS", "FLAPS")
+For j = 1 To flap
+ele = InputBox("ENTER NO. OF ELEMENTS", "ELEMENTARY")
+For i = 1 To ele
+
+size = InputBox("Enter the size below", "SIZE or CHORD")
+sx = InputBox("Enter the size below", "shift x")
+sy = InputBox("Enter the size below", "shift y")
+sz = InputBox("Enter the size below", "shift z")
+theta1 = InputBox("Enter the ANGLE below", "ROTATE IN XY PLANEor AOA")
+theta = InputBox("Enter the ANGLE below", "ROTATE IN YZ PLANE")
+theta2 = 360 - theta1
+Const pi = 3.14159265358979
+
+xr = 3
+yr = 3
+zr = 3
+
+Do While Cells(xr, xc) <> ""
+
+
+sx1 = Cells(xr, xc).Value * size
+sy1 = Cells(yr, yc).Value * size
+sz1 = Cells(zr, zc).Value * size
+
+sy2 = (sz1 * Sin(theta2 * pi / 180) + sy1 * Cos(theta2 * pi / 180))
+sz3 = (sz1 * Cos(theta2 * pi / 180) - sy1 * Sin(theta2 * pi / 180))
+
+sy3 = (sx1 * Sin(theta2 * pi / 180) + sy2 * Cos(theta2 * pi / 180))
+sx3 = (sx1 * Cos(theta2 * pi / 180) - sy2 * Sin(theta2 * pi / 180))
+
+Cells(a, 1) = sx3 + sx
+Cells(b, 2) = sy3 - sy
+Cells(c, 3) = sz3 - sz
+
+a = a + 1
+b = b + 1
+c = c + 1
+xr = xr + 1
+yr = yr + 1
+zr = zr + 1
+Loop
+
+a = a + 4
+b = b + 4
+c = c + 4
+
+Next i
+
+xc = xc + 3
+yc = yc + 3
+zc = zc + 3
+
+Next j
+
+End Sub
